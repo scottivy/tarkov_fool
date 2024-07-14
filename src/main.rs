@@ -35,7 +35,10 @@ fn main() -> anyhow::Result<()> {
             }
         }
 
-        Ok(key) => eft_key = key
+        Ok(_) => {
+            hklm.delete_subkey(EFT_REG_PATH)?;
+            (eft_key,_) = hklm.create_subkey(EFT_REG_PATH)?;
+        }
     }
     println!("Regestry check passed");
 
