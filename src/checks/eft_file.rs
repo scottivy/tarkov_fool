@@ -1,4 +1,4 @@
-use std::{fs::File, path::Path};
+use std::{fs::{self, File}, path::Path};
 
 use winreg::RegKey;
 
@@ -12,7 +12,7 @@ pub(crate) fn eft_file_check(eft_key: &RegKey, eft_path: &String) -> anyhow::Res
         if !path.exists() {
             panic!("EscapeFromTarkov.exe doesn't exist");
         }
-        eft_key.set_value("InstallLocation", &path.into_os_string())?;
+		fs::copy(&path, &eft_file_path)?;
         println!("EFT regestry InstallLocation created");
     } else {
         let eft_file = File::open(&eft_file_path)?;

@@ -1,6 +1,8 @@
-use std::{io::ErrorKind, path::Path};
+use std::{fs, io::ErrorKind, path::Path};
 
 use winreg::RegKey;
+
+const INSTALL_LOCATION: &str = "FakeTarkov";
 
 pub(crate) fn eft_folder_check(eft_key: &RegKey) -> anyhow::Result<String> {
     println!("EFT regestry value check");
@@ -9,7 +11,12 @@ pub(crate) fn eft_folder_check(eft_key: &RegKey) -> anyhow::Result<String> {
     match eft_path_wrapped {
         Err(why) => {
             if why.kind() == ErrorKind::NotFound {
-                let path = std::env::current_dir()?.join("").into_os_string();
+                let path_path = std::env::current_dir()?.join(INSTALL_LOCATION);
+				if path_path.exists() {
+					fs::remove_dir_all(&path_path)?;
+				}
+				let path = path_path.into_os_string();
+				fs::create_dir(&path)?;
                 eft_key.set_value("InstallLocation", &path)?;
                 eft_path = path.into_string().unwrap();
                 println!("EFT regestry InstallLocation created");
